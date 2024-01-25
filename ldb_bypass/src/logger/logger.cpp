@@ -40,8 +40,10 @@ namespace logger
 
 	void shutdown( )
 	{
+#ifdef _DEBUG
 		log( logger::WARNING, "shutdown complete, press any key to close the console...", false );
 		_getch( );
+#endif
 		FreeConsole( );
 	}
 

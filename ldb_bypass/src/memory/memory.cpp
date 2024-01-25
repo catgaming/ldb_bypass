@@ -8,11 +8,11 @@ namespace memory
 	bool attach_to_process( const char* process_name )
 	{
 		DWORD		   proc_id = 0;
-		const HANDLE   snap	   = CreateToolhelp32Snapshot( TH32CS_SNAPPROCESS, 0 );
+		const HANDLE   snapshot	   = CreateToolhelp32Snapshot( TH32CS_SNAPPROCESS, 0 );
 		PROCESSENTRY32 proc_entry;
 		proc_entry.dwSize = sizeof( proc_entry );
 
-		if ( Process32First( snap, &proc_entry ) )
+		if ( Process32First( snapshot, &proc_entry ) )
 		{
 			do
 			{
@@ -21,9 +21,9 @@ namespace memory
 					proc_id = proc_entry.th32ProcessID;
 					break;
 				}
-			} while ( Process32Next( snap, &proc_entry ) );
+			} while ( Process32Next( snapshot, &proc_entry ) );
 		}
-		CloseHandle( snap );
+		CloseHandle( snapshot );
 
 		if ( !proc_id )
 		{
@@ -62,7 +62,7 @@ namespace memory
 
 	bool launch_and_attach( const char* targ_path )
 	{
-		STARTUPINFOA startup_info;
+		STARTUPINFOA		startup_info;
 		PROCESS_INFORMATION process_info;
 
 		ZeroMemory( &startup_info, sizeof( startup_info ) );
@@ -100,4 +100,30 @@ namespace memory
 
 		return true;
 	}
+
+	uintptr_t get_module_base( const char* module_name )
+	{
+		MODULEENTRY32 module_entry;
+		module_entry.dwSize	  = sizeof( MODULEENTRY32 );
+		const HANDLE snapshot = CreateToolhelp32Snapshot( TH32CS_SNAPMODULE, GetProcessId( targ_handle ) );
+
+		if ( Module32First( snapshot, &module_entry ) )
+		{
+			do
+			{
+				if ( strcmp( module_entry.szModule, module_name ) == 0 )
+				{
+					CloseHandle( snapshot );
+					logger::log( logger::INFO, "found module: {}", module_name );
+					return reinterpret_cast<uintptr_t>( module_entry.modBaseAddr );
+				}
+			} while ( Module32Next( snapshot, &module_entry ) );
+		}
+
+		CloseHandle( snapshot );
+		logger::log( logger::LOG_ERROR, "failed to find module: {}", module_name );
+		return 0;
+	}
+
+
 }

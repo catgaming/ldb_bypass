@@ -5,7 +5,7 @@
 
 **roadmap:**
 - external memory management:
-	- attach to application
+	- attach to application :white_check_mark:
 	- read/write bytes
 	- scan for patterns found in ida
 
