@@ -30,7 +30,13 @@ namespace logger
 	extern HANDLE		console_handle;
 	extern unsigned int line_number;
 
-	template <typename... arguments> void log( log_level level, const std::string& format_str, arguments... args, bool newline = true )
+	template <typename... arguments> void log( log_level level, const std::string& format_str, arguments... args )
+	{
+		log( level, format_str, true, args... );
+	}
+
+	template <typename... arguments>
+	void log( log_level level, const std::string& format_str, bool newline, arguments... args )
 	{
 		std::lock_guard<std::mutex> guard( log_mutex );
 
