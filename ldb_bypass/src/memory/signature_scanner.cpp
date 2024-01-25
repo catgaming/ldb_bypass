@@ -56,7 +56,7 @@ namespace signature_scanner
 		const uintptr_t base		  = reinterpret_cast<uintptr_t>( module_info.modBaseAddr );
 		const size_t	size		  = module_info.modBaseSize;
 		uintptr_t		found_address = 0;
-		int				found_count	  = 0;
+		size_t			found_count	  = 0;
 
 		const auto search_patterns = convert_patterns( pattern_strings );
 
@@ -70,7 +70,7 @@ namespace signature_scanner
 			const auto& pattern = search_patterns[ i ];
 			for ( uintptr_t current = base; current < base + size - pattern.size( ); ++current )
 			{
-				std::vector<uint8_t> bytes = memory::read_bytes<uint8_t>( current, pattern.size( ) );
+				std::vector<uint8_t> bytes = memory::read_bytes( current, pattern.size( ) );
 				if ( pattern_matches( bytes.data( ), pattern ) )
 				{
 					logger::log( logger::INFO, "[signature_scanner] pattern[{}] found @ {:X}", i, current );
@@ -86,12 +86,12 @@ namespace signature_scanner
 
 		if ( found_count == 0 )
 		{
-			logger::log( logger::CRITICAL, "[signature_scanner] Pattern not found" );
+			logger::log( logger::CRITICAL, "[signature_scanner] pattern not found" );
 			return 0;
 		}
 		if ( found_count > search_patterns.size( ) )
 		{
-			logger::log( logger::CRITICAL, "[signature_scanner] Pattern found too many times" );
+			logger::log( logger::CRITICAL, "[signature_scanner] pattern found too many times" );
 			return 0;
 		}
 
