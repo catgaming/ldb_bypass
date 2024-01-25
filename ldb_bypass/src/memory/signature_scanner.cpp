@@ -73,7 +73,7 @@ namespace signature_scanner
 				std::vector<uint8_t> bytes = memory::read_bytes( current, pattern.size( ) );
 				if ( pattern_matches( bytes.data( ), pattern ) )
 				{
-					logger::log( logger::INFO, "[signature_scanner] pattern[{}] found @ {:X}", i, current );
+					logger::log( logger::INFO, "[signature_scanner] pattern[{}] found @ 0x{:X}", i, current );
 
 					if ( found_count == 0 )
 					{

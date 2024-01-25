@@ -191,7 +191,7 @@ namespace memory
 			return false;
 		}
 
-		logger::log( logger::LOG_ERROR, "module found: {}", module_name );
+		logger::log( logger::INFO, "info grabbed for module: {}", module_name );
 		return true;
 	}
 
