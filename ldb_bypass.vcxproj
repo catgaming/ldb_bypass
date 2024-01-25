@@ -132,10 +132,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ldb_bypass\src\memory.cpp" />
+    <ClCompile Include="ldb_bypass\src\app.cpp" />
+    <ClCompile Include="ldb_bypass\src\memory\memory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ldb_bypass\src\memory.h" />
+    <ClInclude Include="ldb_bypass\src\includes.h" />
+    <ClInclude Include="ldb_bypass\src\memory\memory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
