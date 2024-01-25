@@ -155,12 +155,14 @@
     <ClCompile Include="ldb_bypass\src\logger\logger.cpp" />
     <ClCompile Include="ldb_bypass\src\memory\memory.cpp" />
     <ClCompile Include="ldb_bypass\src\memory\signature_scanner.cpp" />
+    <ClCompile Include="ldb_bypass\src\patches\keyboard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ldb_bypass\src\includes.h" />
     <ClInclude Include="ldb_bypass\src\logger\logger.h" />
     <ClInclude Include="ldb_bypass\src\memory\memory.h" />
     <ClInclude Include="ldb_bypass\src\memory\signature_scanner.h" />
+    <ClInclude Include="ldb_bypass\src\patches\keyboard.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

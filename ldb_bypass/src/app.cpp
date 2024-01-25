@@ -2,13 +2,18 @@
 
 #include "memory/memory.h"
 
+#include "patches/keyboard.h"
+
+const char* globals::ldb_module_name = "LockDownBrowser.dll";
+
 int main( )
 {
 	logger::initialize( );
 
+	// attach to / load process
 	if ( !memory::attach_to_process( "LockDownBrowser.exe" ) )
 	{
-		logger::log( logger::LOG_ERROR, "LockDownBrowser.exe not running. opening it..." );
+		logger::log( logger::LOG_ERROR, "LockDownBrowser.exe not running. loading..." );
 
 		// may not hardcode this in the future. for now, i dont care
 		if ( !memory::launch_and_attach( "C:\\Program Files (x86)\\Respondus\\LockDown Browser\\LockDownBrowser.exe" ) )
@@ -18,15 +23,23 @@ int main( )
 		}
 	}
 
-	const char* main_module = "LockDownBrowser.dll";
-	logger::log( logger::INFO, "waiting for: {}", main_module );
-	while ( !memory::get_module_base( main_module ) )
+	// get main module
+	MODULEENTRY32 ldb_module_info;
+	logger::log( logger::INFO, "waiting for: {}", globals::ldb_module_name );
+	while ( !memory::get_module_info( globals::ldb_module_name, ldb_module_info ) )
 	{
 		Sleep( 50 );
 	}
+	
+	// apply patch
+	if ( !patches::keyboard_hook( ) )
+	{
+		logger::log( logger::LOG_ERROR, "failed to patch keyboard hook" );
+		return 1;
+	}
 
-	logger::log( logger::INFO, "{} found", main_module );
-
+	logger::log( logger::INFO, "detaching from process..." );
+	memory::detach_from_process( );
 	logger::shutdown( );
 	return 0;
 }

@@ -1,17 +1,58 @@
 #include "../includes.h"
 #include "keyboard.h"
 
+#include "../memory/memory.h"
 #include "../memory/signature_scanner.h"
 
-bool keyboard_hook( )
+namespace patches
 {
-	/*
-	 *	ORIGINAL BYTES:
-	 *	0F 85 CC 01 00 00 -> JNZ rel
-	 *
-	 *	PATCH BYTES:
-	 *	E9 CD 01 00 00 90 -> JMP rel
-	 */
+	bool keyboard_hook( )
+	{
+		/*
+		 *	ORIGINAL BYTES:
+		 *	0F 85 CC 01 00 00 -> JNZ rel
+		 *
+		 *	PATCH BYTES:
+		 *	E9 CD 01 00 00 90 -> JMP rel
+		 */
 
+		/*
+		 *	FUNCTION SIG:
+		 *	55 8B EC 83 EC ? 83 7D ? ? 53
+		 *
+		 *	XREF Signature #1 @ 11035: 68 ? ? ? ? EB ? 68 ? ? ? ? 6A ? FF 15
+		 *	XREF Signature #2 @ 110DA: 68 ? ? ? ? EB ? 68 ? ? ? ? 6A ? FF D7 6A
+		 *
+		 *	will have to implement offset handling if i use the xref signatures.
+		 *	and in this case, if the function sig breaks, its 100% likely that my patch offset will break too
+		 */
 
+		// get the function address
+		const auto keyboard_callback = signature_scanner::find_pattern( globals::ldb_module_name, { "55 8B EC 83 EC ? 83 7D ? ? 53" } );
+		if ( !keyboard_callback )
+		{
+			logger::log( logger::LOG_ERROR, "failed to find keyboard callback. outdated signature?" );
+			return false;
+		}
+
+		// set patch info
+		const uintptr_t patch_address = keyboard_callback + 0x12; // function is 0x12 away from the patch location
+		std::vector<uint8_t> patch_bytes = { 0xE9, 0xCD, 0x01, 0x00, 0x00, 0x90 };
+
+		// adjust memory protection and apply patch
+		DWORD old_protect;
+		if ( VirtualProtectEx( memory::targ_handle, reinterpret_cast<LPVOID>( patch_address ), patch_bytes.size( ), PAGE_EXECUTE_READWRITE, &old_protect ) )
+		{
+			memory::write_bytes( patch_address, patch_bytes );
+			VirtualProtectEx( memory::targ_handle, reinterpret_cast<LPVOID>( patch_address ), patch_bytes.size( ), old_protect, &old_protect );
+		}
+		else
+		{
+			logger::log( logger::LOG_ERROR, "failed to adjust memory protection" );
+			return false;
+		}
+
+		logger::log( logger::INFO, "keyboard hook patched" );
+		return true;
+	}
 }
