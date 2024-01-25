@@ -4,7 +4,10 @@
 
 int main( )
 {
-	std::cout << "hello world\n"; 
+	logger::initialize( );
 
+	memory::launch_and_attach( "C:\\Program Files (x86)\\Respondus\\LockDown Browser\\LockDownBrowser.exe" );
+
+	logger::shutdown( );
 	return 0;
 }
