@@ -1,9 +1,5 @@
 #pragma once
 
-// ripped this from another one of my projects ( not a public repo on here )..
-// so if its messy, that's why. didn't expect to ever show this code, and it works sooo
-// just removed the shit that wasn't needed for this project
-
 #include <format>
 #include <iostream>
 #include <mutex>
@@ -34,7 +30,7 @@ namespace logger
 	extern HANDLE		console_handle;
 	extern unsigned int line_number;
 
-	template <typename... arguments> void log( log_level level, const std::string& format_str, arguments... args )
+	template <typename... arguments> void log( log_level level, const std::string& format_str, arguments... args, bool newline = true )
 	{
 		std::lock_guard<std::mutex> guard( log_mutex );
 
@@ -51,7 +47,12 @@ namespace logger
 
 		// use std::vformat with std::make_format_args for the actual log message
 		auto format_args = std::make_format_args( args... );
-		std::cout << std::vformat( format_str, format_args ) << std::endl;
+		
+		std::cout << std::vformat( format_str, format_args );
+		if ( newline )
+		{
+			std::cout << '\n';
+		}
 
 		line_number++;
 	}

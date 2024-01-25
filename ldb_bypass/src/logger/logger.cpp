@@ -19,7 +19,7 @@ namespace logger
 	{
 		AllocConsole( );
 		freopen_s( reinterpret_cast<FILE**>( stdout ), "CONOUT$", "w", stdout );
-		SetConsoleTitleA( "ldb bypass ^-^ enjoy" );
+		SetConsoleTitleA( "l0ckd0wnbr0w53r byp455" );
 
 		console_handle = GetStdHandle( STD_OUTPUT_HANDLE );
 		if ( console_handle == INVALID_HANDLE_VALUE )
@@ -40,7 +40,8 @@ namespace logger
 
 	void shutdown( )
 	{
-		log( logger::INFO, "[logger] Shutdown complete." );
+		log( logger::WARNING, "shutdown complete, press any key to close the console...", false );
+		_getch( );
 		FreeConsole( );
 	}
 
