@@ -21,12 +21,24 @@
     <ClCompile Include="ldb_bypass\src\app.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ldb_bypass\src\memory\signature_scanner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ldb_bypass\src\logger\logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ldb_bypass\src\memory\memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ldb_bypass\src\includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ldb_bypass\src\memory\signature_scanner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ldb_bypass\src\logger\logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
