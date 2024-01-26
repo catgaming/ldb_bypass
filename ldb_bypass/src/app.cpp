@@ -3,6 +3,7 @@
 #include "memory/memory.h"
 
 #include "patches/keyboard.h"
+#include "patches/misc.h"
 
 const char* globals::ldb_module_name = "LockDownBrowser.dll";
 
@@ -35,6 +36,13 @@ int main( )
 	if ( !patches::keyboard_hook( ) )
 	{
 		logger::log( logger::LOG_ERROR, "failed to patch keyboard hook" );
+		return 1;
+	}
+
+	Sleep( 10000 );
+	if ( !patches::shell_window( ) )
+	{
+		logger::log( logger::LOG_ERROR, "failed to patch misc" );
 		return 1;
 	}
 

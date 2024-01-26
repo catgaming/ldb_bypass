@@ -156,6 +156,7 @@
     <ClCompile Include="ldb_bypass\src\memory\memory.cpp" />
     <ClCompile Include="ldb_bypass\src\memory\signature_scanner.cpp" />
     <ClCompile Include="ldb_bypass\src\patches\keyboard.cpp" />
+    <ClCompile Include="ldb_bypass\src\patches\misc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ldb_bypass\src\includes.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="ldb_bypass\src\memory\memory.h" />
     <ClInclude Include="ldb_bypass\src\memory\signature_scanner.h" />
     <ClInclude Include="ldb_bypass\src\patches\keyboard.h" />
+    <ClInclude Include="ldb_bypass\src\patches\misc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
