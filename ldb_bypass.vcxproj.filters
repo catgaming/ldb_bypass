@@ -27,7 +27,7 @@
     <ClCompile Include="ldb_bypass\src\logger\logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ldb_bypass\src\patches\keyboard.cpp">
+    <ClCompile Include="ldb_bypass\src\patches\input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ldb_bypass\src\patches\misc.cpp">
@@ -47,7 +47,7 @@
     <ClInclude Include="ldb_bypass\src\logger\logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ldb_bypass\src\patches\keyboard.h">
+    <ClInclude Include="ldb_bypass\src\patches\input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ldb_bypass\src\patches\misc.h">

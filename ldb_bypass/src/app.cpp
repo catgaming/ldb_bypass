@@ -2,7 +2,7 @@
 
 #include "memory/memory.h"
 
-#include "patches/keyboard.h"
+#include "patches/input.h"
 #include "patches/misc.h"
 
 const char* globals::ldb_module_name = "LockDownBrowser.dll";
@@ -32,25 +32,26 @@ int main( )
 		Sleep( 50 );
 	}
 	
-	// apply patch
-	if ( !patches::keyboard_hook( ) || !patches::keyboard2_hook( ) )
+	// apply patches
+	if ( !patches::cb_keyboard( ) || !patches::cb_keyboard2( ) )
 	{
-		logger::log( logger::LOG_ERROR, "failed to patch keyboard hooks" );
+		logger::log( logger::LOG_ERROR, "keyboard patch(es) failed" );
 		return 1;
 	}
 
-	for ( int i = 0; i < 60; i++)
+	if ( !patches::cb_mouse( ) )
 	{
-		if ( !patches::shell_window( ) )
-		{
-			Sleep( 500 );
-		}
-		else
-		{
-			logger::log( logger::INFO, "successfully showed shell window" );
-			break;
-		}
+		logger::log( logger::LOG_ERROR, "mouse patch failed" );
+		return 1;
 	}
+
+	/*
+	if ( !patches::shell_window( ) )
+	{
+		logger::log( logger::LOG_ERROR, "shell window fix failed" );
+		return 1;
+	}
+	*/
 
 	logger::log( logger::INFO, "detaching from process..." );
 	memory::detach_from_process( );

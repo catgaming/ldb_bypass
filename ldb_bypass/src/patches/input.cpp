@@ -1,12 +1,12 @@
 #include "../includes.h"
-#include "keyboard.h"
+#include "input.h"
 
 #include "../memory/memory.h"
 #include "../memory/signature_scanner.h"
 
 namespace patches
 {
-	bool keyboard_hook( )
+	bool cb_keyboard( )
 	{
 		/*
 		 *	ORIGINAL BYTES:
@@ -57,7 +57,7 @@ namespace patches
 		return true;
 	}
 
-	bool keyboard2_hook( )
+	bool cb_keyboard2( )
 	{
 		/*
 		 *	ORIGINAL BYTES:
@@ -81,7 +81,7 @@ namespace patches
 			signature_scanner::find_pattern( globals::ldb_module_name, { "55 8B EC 83 7D ? ? 53 8B 5D ? 57" } );
 		if ( !keyboard2_callback )
 		{
-			logger::log( logger::LOG_ERROR, "failed to find keyboard callback. outdated signature?" );
+			logger::log( logger::LOG_ERROR, "failed to find keyboard2 callback. outdated signature?" );
 			return false;
 		}
 
@@ -104,7 +104,55 @@ namespace patches
 			return false;
 		}
 
-		logger::log( logger::INFO, "keyboard hook patched" );
+		logger::log( logger::INFO, "keyboard2 hook patched" );
+		return true;
+	}
+
+	bool cb_mouse( )
+	{
+		/*
+		 *	ORIGINAL BYTES:
+		 *	75 4F -> JNZ short rel
+		 *
+		 *	PATCH BYTES:
+		 *	EB 4F -> JMP short rel
+		 */
+
+		/*
+		 *	FUNCTION SIG:
+		 *	55 8B EC 8B 4D ? 85 C9 79
+		 *  PATCH OFF: 0x24
+		 *
+		 *	XREF Signature #1 @ 11212: 68 ? ? ? ? 6A ? FF 15 ? ? ? ? 33 C9
+		 *	XREF Signature #2 @ 11111: 68 ? ? ? ? EB ? 68 ? ? ? ? 6A ? FF D7 39 35
+		 */
+
+		// get the function address
+		const auto keyboard2_callback = signature_scanner::find_pattern( globals::ldb_module_name, { "55 8B EC 8B 4D ? 85 C9 79" } );
+		if ( !keyboard2_callback )
+		{
+			logger::log( logger::LOG_ERROR, "failed to find mouse callback. outdated signature?" );
+			return false;
+		}
+
+		// set patch info
+		const uintptr_t		 patch_address = keyboard2_callback + 0x24;
+		std::vector<uint8_t> patch_bytes   = { 0xEB, 0x4F };
+
+		// adjust memory protection and apply patch
+		DWORD old_protect;
+		if ( VirtualProtectEx( memory::targ_handle, reinterpret_cast<LPVOID>( patch_address ), patch_bytes.size( ), PAGE_EXECUTE_READWRITE, &old_protect ) )
+		{
+			memory::write_bytes( patch_address, patch_bytes );
+			VirtualProtectEx( memory::targ_handle, reinterpret_cast<LPVOID>( patch_address ), patch_bytes.size( ), old_protect, &old_protect );
+		}
+		else
+		{
+			logger::log( logger::LOG_ERROR, "failed to adjust memory protection" );
+			return false;
+		}
+
+		logger::log( logger::INFO, "mouse hook patched" );
 		return true;
 	}
 }
