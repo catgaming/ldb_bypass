@@ -14,7 +14,7 @@ int main( )
 	// attach to / load process
 	if ( !memory::attach_to_process( "LockDownBrowser.exe" ) )
 	{
-		logger::log( logger::LOG_ERROR, "LockDownBrowser.exe not running. loading..." );
+		logger::log( logger::DEBUG, "LockDownBrowser.exe not running. loading..." );
 
 		// may not hardcode this in the future. for now, i dont care
 		if ( !memory::launch_and_attach( "C:\\Program Files (x86)\\Respondus\\LockDown Browser\\LockDownBrowser.exe" ) )
@@ -33,17 +33,23 @@ int main( )
 	}
 	
 	// apply patch
-	if ( !patches::keyboard_hook( ) )
+	if ( !patches::keyboard_hook( ) || !patches::keyboard2_hook( ) )
 	{
-		logger::log( logger::LOG_ERROR, "failed to patch keyboard hook" );
+		logger::log( logger::LOG_ERROR, "failed to patch keyboard hooks" );
 		return 1;
 	}
 
-	Sleep( 10000 );
-	if ( !patches::shell_window( ) )
+	for ( int i = 0; i < 60; i++)
 	{
-		logger::log( logger::LOG_ERROR, "failed to patch misc" );
-		return 1;
+		if ( !patches::shell_window( ) )
+		{
+			Sleep( 500 );
+		}
+		else
+		{
+			logger::log( logger::INFO, "successfully showed shell window" );
+			break;
+		}
 	}
 
 	logger::log( logger::INFO, "detaching from process..." );
