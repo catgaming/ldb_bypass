@@ -39,9 +39,9 @@ int main( )
 		return 1;
 	}
 
-	if ( !patches::cb_mouse( ) )
+	if ( !patches::cb_mouse( ) || !patches::cb_mouse2( ) )
 	{
-		logger::log( logger::LOG_ERROR, "mouse patch failed" );
+		logger::log( logger::LOG_ERROR, "mouse patch(es) failed" );
 		return 1;
 	}
 

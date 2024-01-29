@@ -125,4 +125,42 @@ namespace patches
 		logger::log( logger::INFO, "mouse hook patched" );
 		return true;
 	}
+
+	bool cb_mouse2( )
+	{
+		/*
+		 *	ORIGINAL BYTES:
+		 *	0F 85 85 00 00 00 -> JNZ rel
+		 *
+		 *	PATCH BYTES:
+		 *	E9 86 00 00 00 -> JMP rel
+		 */
+
+		/*
+		 *	FUNCTION SIG:
+		 *	55 8B EC 57 8B 7D ? 85 FF 79
+		 *  PATCH OFF: 0x29
+		 *
+		 *	XREF Signature #1 @ 11118: 68 ? ? ? ? 6A ? FF D7 39 35
+		 */
+
+		// get the function address
+		const auto mouse2_callback = signature_scanner::find_pattern( globals::ldb_module_name, { "55 8B EC 57 8B 7D ? 85 FF 79" } );
+		if ( !mouse2_callback )
+		{
+			logger::log( logger::LOG_ERROR, "failed to find mouse2 callback. outdated signature?" );
+			return false;
+		}
+
+		// set patch info and call apply_patch
+		if ( const std::vector<uint8_t> patch_bytes = { 0xE9, 0x86, 0x00, 0x00, 0x00 };
+			 !memory::apply_patch( mouse2_callback, 0x29, patch_bytes ) )
+		{
+			logger::log( logger::LOG_ERROR, "failed to apply patch" );
+			return false;
+		}
+
+		logger::log( logger::INFO, "mouse2 hook patched" );
+		return true;
+	}
 }
