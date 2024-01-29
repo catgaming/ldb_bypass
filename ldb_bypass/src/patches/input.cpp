@@ -14,13 +14,15 @@ namespace patches
 		 *
 		 *	PATCH BYTES:
 		 *	E9 CD 01 00 00 90 -> JMP rel
+		 *
+		 *	PATCH OFF:
+		 *	0x12
 		 */
 
 		/*
 		 *	FUNCTION SIG:
 		 *	55 8B EC 83 EC ? 83 7D ? ? 53
-		 *	PATCH OFF: 0x12
-		 *
+		 *	
 		 *	XREF Signature #1 @ 11035: 68 ? ? ? ? EB ? 68 ? ? ? ? 6A ? FF 15
 		 *	XREF Signature #2 @ 110DA: 68 ? ? ? ? EB ? 68 ? ? ? ? 6A ? FF D7 6A
 		 *
@@ -56,12 +58,14 @@ namespace patches
 		 *
 		 *	PATCH BYTES:
 		 *	EB 7A -> JMP short rel
+		 *
+		 *	PATCH OFF:
+		 *	0xE
 		 */
 
 		/*
 		 *	FUNCTION SIG:
 		 *	55 8B EC 83 7D ? ? 53 8B 5D ? 57
-		 *  PATCH OFF: 0xE
 		 *
 		 *	XREF Signature #1 @ 110E1: 68 ? ? ? ? 6A ? FF D7 6A
 		 *	XREF Signature #2 @ 1103C: 68 ? ? ? ? 6A ? FF 15 ? ? ? ? 8B C8
@@ -95,12 +99,14 @@ namespace patches
 		 *
 		 *	PATCH BYTES:
 		 *	EB 4F -> JMP short rel
+		 *
+		 *	PATCH OFF:
+		 *	0x24
 		 */
 
 		/*
 		 *	FUNCTION SIG:
 		 *	55 8B EC 8B 4D ? 85 C9 79
-		 *  PATCH OFF: 0x24
 		 *
 		 *	XREF Signature #1 @ 11212: 68 ? ? ? ? 6A ? FF 15 ? ? ? ? 33 C9
 		 *	XREF Signature #2 @ 11111: 68 ? ? ? ? EB ? 68 ? ? ? ? 6A ? FF D7 39 35
@@ -134,13 +140,15 @@ namespace patches
 		 *
 		 *	PATCH BYTES:
 		 *	E9 86 00 00 00 -> JMP rel
+		 *
+		 *	PATCH OFF:
+		 *  0x29
 		 */
 
 		/*
 		 *	FUNCTION SIG:
 		 *	55 8B EC 57 8B 7D ? 85 FF 79
-		 *  PATCH OFF: 0x29
-		 *
+		 *  
 		 *	XREF Signature #1 @ 11118: 68 ? ? ? ? 6A ? FF D7 39 35
 		 */
 
@@ -161,6 +169,64 @@ namespace patches
 		}
 
 		logger::log( logger::INFO, "mouse2 hook patched" );
+		return true;
+	}
+
+	bool cb_shell( )
+	{
+		/*
+		 *	ORIGINAL BYTES:
+		 *	74 1C -> JZ short rel
+		 *
+		 *	PATCH BYTES:
+		 *	90 90 -> NOP
+		 *
+		 *	PATCH OFF:
+		 *	0x09
+		 */
+
+		/*
+		 *	ORIGINAL BYTES:
+		 *	74 17 -> JZ short rel
+		 *
+		 *	PATCH BYTES:
+		 *	90 90 -> NOP
+		 *
+		 *	PATCH OFF:
+		 *  0x0E
+		 */
+
+		/*
+		 *	FUNCTION SIG:
+		 *	55 8B EC 8B 45 ? 83 F8
+		 *
+		 *	XREF Signature #1 @ 110F7: 68 ? ? ? ? 6A ? FF D7 A3
+		 */
+
+		// get the function address
+		const auto shell_callback = signature_scanner::find_pattern( globals::ldb_module_name, { "55 8B EC 8B 45 ? 83 F8" } );
+		if ( !shell_callback )
+		{
+			logger::log( logger::LOG_ERROR, "failed to find shell callback. outdated signature?" );
+			return false;
+		}
+
+		// set patch info and call apply_patch
+		if ( const std::vector<uint8_t> patch_bytes = { 0x90, 0x90 };
+			 !memory::apply_patch( shell_callback, 0x09, patch_bytes ) )
+		{
+			logger::log( logger::LOG_ERROR, "failed to apply patch" );
+			return false;
+		}
+
+		if ( const std::vector<uint8_t> patch_bytes = { 0x90, 0x90 };
+			 !memory::apply_patch( shell_callback, 0x0E, patch_bytes ) )
+		{
+			logger::log( logger::LOG_ERROR, "failed to apply patch2" );
+			return false;
+		}
+
+		logger::log( logger::INFO, "shell hook patched" );
 		return true;
 	}
 }

@@ -9,4 +9,5 @@ namespace patches
 
 	bool cb_mouse( );
 	bool cb_mouse2( );
+	bool cb_shell( );
 }
