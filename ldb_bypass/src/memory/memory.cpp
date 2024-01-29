@@ -41,7 +41,7 @@ namespace memory
 			return false;
 		}
 
-		logger::log( logger::INFO, "successfully opened process handle" );
+		logger::log( logger::DEBUG, "successfully opened process handle" );
 		return true;
 	}
 
@@ -52,7 +52,7 @@ namespace memory
 			CloseHandle( targ_handle );
 			targ_handle = nullptr;
 
-			logger::log( logger::INFO, "successfully closed process handle" );
+			logger::log( logger::DEBUG, "successfully closed process handle" );
 			return true;
 		}
 
@@ -86,7 +86,7 @@ namespace memory
 			return false;
 		}
 
-		logger::log( logger::INFO, "successfully created process" );
+		logger::log( logger::DEBUG, "successfully created process" );
 
 		targ_handle = process_info.hProcess;
 
@@ -96,69 +96,10 @@ namespace memory
 			return false;
 		}
 
-		logger::log( logger::INFO, "successfully opened process handle" );
+		logger::log( logger::DEBUG, "successfully opened process handle" );
 
 		return true;
 	}
-
-	/*
-	uintptr_t get_module_base( const char* module_name )
-	{
-		MODULEENTRY32 module_entry;
-		module_entry.dwSize	  = sizeof( MODULEENTRY32 );
-		const HANDLE snapshot = CreateToolhelp32Snapshot( TH32CS_SNAPMODULE, GetProcessId( targ_handle ) );
-		if ( snapshot == INVALID_HANDLE_VALUE )
-		{
-			logger::log( logger::LOG_ERROR, "failed to create snapshot" );
-			return 0;
-		}
-
-		if ( Module32First( snapshot, &module_entry ) )
-		{
-			do
-			{
-				if ( strcmp( module_entry.szModule, module_name ) == 0 )
-				{
-					CloseHandle( snapshot );
-					logger::log( logger::INFO, "found module: {}", module_name );
-					return reinterpret_cast<uintptr_t>( module_entry.modBaseAddr );
-				}
-			} while ( Module32Next( snapshot, &module_entry ) );
-		}
-
-		CloseHandle( snapshot );
-		logger::log( logger::LOG_ERROR, "failed to find module: {}", module_name );
-		return 0;
-	}
-
-	size_t get_module_size( const char* module_name )
-	{
-		MODULEENTRY32 module_entry;
-		module_entry.dwSize	  = sizeof( MODULEENTRY32 );
-		const HANDLE snapshot = CreateToolhelp32Snapshot( TH32CS_SNAPMODULE, GetProcessId( targ_handle ) );
-		if ( snapshot == INVALID_HANDLE_VALUE )
-		{
-			logger::log( logger::LOG_ERROR, "failed to create snapshot" );
-			return 0;
-		}
-
-		if ( Module32First( snapshot, &module_entry ) )
-		{
-			do
-			{
-				if ( strcmp( module_entry.szModule, module_name ) == 0 )
-				{
-					CloseHandle( snapshot );
-					return module_entry.modBaseSize;
-				}
-			} while ( Module32Next( snapshot, &module_entry ) );
-		}
-
-		CloseHandle( snapshot );
-		logger::log( logger::LOG_ERROR, "failed to find module: {}", module_name );
-		return 0;
-	}
-	*/
 
 	bool get_module_info( const char* module_name, MODULEENTRY32& module_info )
 	{
@@ -191,11 +132,11 @@ namespace memory
 			return false;
 		}
 
-		logger::log( logger::INFO, "info grabbed for module: {}", module_name );
+		logger::log( logger::DEBUG, "info grabbed for module: {}", module_name );
 		return true;
 	}
 
-	std::vector<uint8_t> read_bytes( uintptr_t address, size_t size )
+	std::vector<uint8_t> read_bytes( const uintptr_t address, const size_t size )
 	{
 		std::vector<uint8_t> buffer( size );
 		SIZE_T				 bytes_read; // for dbg
@@ -203,9 +144,36 @@ namespace memory
 		return buffer;
 	}
 
-	bool write_bytes( uintptr_t address, std::vector<uint8_t>& bytes )
+	bool write_bytes( const uintptr_t address, const std::vector<uint8_t>& bytes )
 	{
 		SIZE_T bytes_written; // for dbg
 		return WriteProcessMemory( targ_handle, reinterpret_cast<LPVOID>( address ), bytes.data( ), bytes.size( ), &bytes_written );
+	}
+
+	bool apply_patch( const uintptr_t base_address, const size_t offset, const std::vector<uint8_t>& patch_bytes )
+	{
+		const uintptr_t patch_address = base_address + offset;
+
+		DWORD old_protect;
+		if ( VirtualProtectEx( targ_handle, reinterpret_cast<LPVOID>( patch_address ), patch_bytes.size( ),
+							   PAGE_EXECUTE_READWRITE, &old_protect ) )
+		{
+			if ( !write_bytes( patch_address, patch_bytes ) )
+			{
+				logger::log( logger::LOG_ERROR, "failed to write patch bytes" );
+				VirtualProtectEx( targ_handle, reinterpret_cast<LPVOID>( patch_address ), patch_bytes.size( ),
+								  old_protect, &old_protect );
+				return false;
+			}
+
+			VirtualProtectEx( targ_handle, reinterpret_cast<LPVOID>( patch_address ), patch_bytes.size( ), old_protect,
+							  &old_protect );
+			return true;
+		}
+		else
+		{
+			logger::log( logger::LOG_ERROR, "failed to adjust memory protection" );
+			return false;
+		}
 	}
 }
