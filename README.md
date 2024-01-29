@@ -12,5 +12,7 @@
 	
 - spefic bypasses:	
 	- keyboard callbacks ( unblocks alt tab, windows keys, etc ) :white_check_mark: 
+	- mouse callbacks ( unblocks double click, right click, middle, etc ) :white_check_mark:
+	- shell callback
 
 - im expecting more to come as i continue to reverse dynamically/dig deeper. the above is only going to bypass key presses so far..
