@@ -33,6 +33,7 @@ int main( )
 	}
 	
 	// apply patches
+	
 	if ( !patches::cb_keyboard( ) || !patches::cb_keyboard2( ) )
 	{
 		logger::log( logger::LOG_ERROR, "keyboard patch(es) failed" );
@@ -44,6 +45,14 @@ int main( )
 		logger::log( logger::LOG_ERROR, "mouse patch(es) failed" );
 		return 1;
 	}
+	
+	/*
+	if ( !patches::cldb_do_some_stuff( ) )
+	{
+		logger::log( logger::LOG_ERROR, "cldb_do_some_stuff patch failed" );
+		return 1;
+	}
+	*/
 
 	/*
 	if ( !patches::shell_window( ) )

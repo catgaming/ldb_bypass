@@ -6,7 +6,7 @@
 	- read/write bytes :white_check_mark:
 	- scan for patterns found in ida :white_check_mark:
 
-- application specific bypasses:
+- application bypasses:
 	- find pattern in ida :white_check_mark:
 	- patch necessary bytes in memory to bypass specific checks/callbacks :white_check_mark:
 	
@@ -18,3 +18,5 @@
 ***NOTE***: 
 this is a work in progress, and will be updated as i continue to reverse the browser. i will be adding more bypasses as i find them.
 as of NOW, i have only tested OUTSIDE of quizzes. i am 90% sure that there is an integrity check somewhere. after i add some more patches, i'll look for it
+
+**i'm thinking of abandoning this for internal atm**

@@ -10,4 +10,6 @@ namespace patches
 	bool cb_mouse( );
 	bool cb_mouse2( );
 	bool cb_shell( );
+
+	bool cldb_do_some_stuff( ); // only useful if we also call the function rapidly
 }

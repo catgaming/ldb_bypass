@@ -229,4 +229,45 @@ namespace patches
 		logger::log( logger::INFO, "shell hook patched" );
 		return true;
 	}
+
+	bool cldb_do_some_stuff( )
+	{
+		/*
+		 *	ORIGINAL BYTES:
+		 *	0F 84 9F 00 00 00 -> JZ rel
+		 *
+		 *	PATCH BYTES:
+		 *	E9 A0 00 00 00 -> JMP rel
+		 *
+		 *	PATCH OFF:
+		 *  0x1F
+		 */
+
+		/*
+		 *	FUNCTION SIG:
+		 *	55 8B EC 8B 4D ? 83 EC ? 8B 09
+		 *	XREF:
+		 *	check exports
+		 */
+
+		// get the function address
+		const auto cldb_do_some_stuff_fn =
+			signature_scanner::find_pattern( globals::ldb_module_name, { "55 8B EC 8B 4D ? 83 EC ? 8B 09" } );
+		if ( !cldb_do_some_stuff_fn )
+		{
+			logger::log( logger::LOG_ERROR, "failed to find cldb_do_some_stuff. outdated signature?" );
+			return false;
+		}
+
+		// set patch info and call apply_patch
+		if ( const std::vector<uint8_t> patch_bytes = { 0xE9, 0xA0, 0x00, 0x00, 0x00 };
+			 !memory::apply_patch( cldb_do_some_stuff_fn, 0x1F, patch_bytes ) )
+		{
+			logger::log( logger::LOG_ERROR, "failed to apply patch" );
+			return false;
+		}
+
+		logger::log( logger::INFO, "cldb_do_some_stuff patched to always unhook" );
+		return true;
+	}
 }
