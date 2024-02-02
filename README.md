@@ -15,6 +15,10 @@
 	- mouse callbacks ( unblocks double click, right click, middle, etc ) :white_check_mark:
 	- shell callback ( unsure, it filters what i think is WH_MOUSE and WH_CALLWNDPROCRET. might aswell bypass it :shrug: ) :white_check_mark:
 
+	- find blacklist and bypass it :x:
+	- bypass second monitor window :x:
+	- bypass vm check :x:
+
 ***NOTE***: 
 this is a work in progress, and will be updated as i continue to reverse the browser. i will be adding more bypasses as i find them.
 as of NOW, i have only tested OUTSIDE of quizzes. i am 90% sure that there is an integrity check somewhere. after i add some more patches, i'll look for it
